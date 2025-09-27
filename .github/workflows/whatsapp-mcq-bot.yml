@@ -32,7 +32,7 @@ jobs:
         
     - name: Start WAHA container
       run: |
-        # Start WAHA container
+        # Start WAHA container with proper configuration
         docker run -d \
           --name waha-mcq-bot \
           -p 3000:3000 \
@@ -40,6 +40,7 @@ jobs:
           -e WAHA_WEBHOOK_EVENTS="message,message.any" \
           -e WAHA_REJECT_CALLS=true \
           -e WAHA_MARK_ONLINE_ON_CONNECT=true \
+          -e WAHA_SESSION_NAME="default" \
           devlikeapro/waha:latest
         
         # Wait for WAHA to start
@@ -68,18 +69,21 @@ jobs:
             }
           }'
         
-        # Get QR code (for initial setup)
-        echo "Getting QR code for WhatsApp connection..."
-        echo "=========================================="
-        # Try different QR code endpoints
-        QR_RESPONSE=$(curl -X GET http://localhost:3000/api/sessions/default/auth/qr-code 2>/dev/null || curl -X GET http://localhost:3000/api/sessions/default/auth/qr 2>/dev/null || echo "QR code endpoint not found")
-        echo "QR Code Response: $QR_RESPONSE"
-        echo "=========================================="
+        # Wait for session to be ready
+        echo "Waiting for session to be ready..."
+        sleep 15
         
-        # Also try to get session status to see what's available
+        # Check session status
         echo "Session Status:"
         curl -X GET http://localhost:3000/api/sessions/default
         echo ""
+        
+        # Get QR code (for initial setup)
+        echo "Getting QR code for WhatsApp connection..."
+        echo "=========================================="
+        # Try to get QR code
+        curl -X GET http://localhost:3000/api/sessions/default/auth/qr-code
+        echo "=========================================="
         
         # Wait for connection (this will timeout in CI, but that's expected)
         echo "Waiting for WhatsApp connection..."
