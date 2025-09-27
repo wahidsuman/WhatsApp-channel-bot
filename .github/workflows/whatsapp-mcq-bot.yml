@@ -40,7 +40,7 @@ jobs:
           -e WAHA_WEBHOOK_EVENTS="message,message.any" \
           -e WAHA_REJECT_CALLS=true \
           -e WAHA_MARK_ONLINE_ON_CONNECT=true \
-          devlikeapro/waha-plus:latest
+          devlikeapro/waha:latest
         
         # Wait for WAHA to start
         echo "Waiting for WAHA to start..."
