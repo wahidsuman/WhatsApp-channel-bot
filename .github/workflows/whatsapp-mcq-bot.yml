@@ -91,6 +91,9 @@ jobs:
         echo "Trying /api/sessions/default/qr..."
         curl -X GET http://localhost:3000/api/sessions/default/qr
         echo ""
+        echo "Trying to access WAHA web interface..."
+        curl -X GET http://localhost:3000/
+        echo ""
         echo "=========================================="
         
         # Wait for connection (this will timeout in CI, but that's expected)
