@@ -70,7 +70,10 @@ jobs:
         
         # Get QR code (for initial setup)
         echo "Getting QR code for WhatsApp connection..."
-        curl -X GET http://localhost:3000/api/sessions/mcq_bot/auth/qr
+        echo "=========================================="
+        QR_RESPONSE=$(curl -X GET http://localhost:3000/api/sessions/mcq_bot/auth/qr)
+        echo "QR Code Response: $QR_RESPONSE"
+        echo "=========================================="
         
         # Wait for connection (this will timeout in CI, but that's expected)
         echo "Waiting for WhatsApp connection..."
