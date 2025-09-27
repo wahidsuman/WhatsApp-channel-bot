@@ -13,7 +13,7 @@ ANSWERS_CHANNEL_ID = os.getenv("ANSWERS_CHANNEL_ID", "your_answers_channel_id")
 
 # WAHA Configuration
 WAHA_BASE_URL = os.getenv("WAHA_BASE_URL", "http://localhost:3000")
-WAHA_SESSION_NAME = os.getenv("WAHA_SESSION_NAME", "mcq_bot")
+WAHA_SESSION_NAME = os.getenv("WAHA_SESSION_NAME", "default")
 
 # Bot Settings
 BOT_NAME = "MCQ Bot"

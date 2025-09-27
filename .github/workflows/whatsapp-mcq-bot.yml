@@ -53,11 +53,11 @@ jobs:
         
     - name: Setup WhatsApp session
       run: |
-        # Start WAHA session
-        curl -X POST http://localhost:3000/api/sessions/mcq_bot/start \
+        # Start WAHA session (use 'default' session for free version)
+        curl -X POST http://localhost:3000/api/sessions/default/start \
           -H "Content-Type: application/json" \
           -d '{
-            "name": "mcq_bot",
+            "name": "default",
             "config": {
               "webhooks": [],
               "webhookEvents": ["message", "message.any"],
@@ -71,20 +71,20 @@ jobs:
         # Get QR code (for initial setup)
         echo "Getting QR code for WhatsApp connection..."
         echo "=========================================="
-        QR_RESPONSE=$(curl -X GET http://localhost:3000/api/sessions/mcq_bot/auth/qr)
+        QR_RESPONSE=$(curl -X GET http://localhost:3000/api/sessions/default/auth/qr)
         echo "QR Code Response: $QR_RESPONSE"
         echo "=========================================="
         
         # Wait for connection (this will timeout in CI, but that's expected)
         echo "Waiting for WhatsApp connection..."
-        timeout 60 bash -c 'until curl -s http://localhost:3000/api/sessions/mcq_bot | grep -q "WORKING"; do sleep 5; done' || echo "Connection timeout (expected in CI)"
+        timeout 60 bash -c 'until curl -s http://localhost:3000/api/sessions/default | grep -q "WORKING"; do sleep 5; done' || echo "Connection timeout (expected in CI)"
         
     - name: Run MCQ Bot
       env:
         QUESTIONS_CHANNEL_ID: ${{ secrets.QUESTIONS_CHANNEL_ID }}
         ANSWERS_CHANNEL_ID: ${{ secrets.ANSWERS_CHANNEL_ID }}
         WAHA_BASE_URL: http://localhost:3000
-        WAHA_SESSION_NAME: mcq_bot
+        WAHA_SESSION_NAME: default
       run: |
         # Run the bot
         python bot.py
