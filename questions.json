@@ -1,0 +1,144 @@
+{
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is the capital of France?",
+      "options": {
+        "A": "London",
+        "B": "Paris",
+        "C": "Berlin",
+        "D": "Madrid"
+      },
+      "correct_answer": "B",
+      "explanation": "Paris has been the capital of France since the 12th century and is home to famous landmarks like the Eiffel Tower and Louvre Museum.",
+      "category": "Geography",
+      "difficulty": "Easy"
+    },
+    {
+      "id": 2,
+      "question": "Which planet is known as the Red Planet?",
+      "options": {
+        "A": "Venus",
+        "B": "Mars",
+        "C": "Jupiter",
+        "D": "Saturn"
+      },
+      "correct_answer": "B",
+      "explanation": "Mars is called the Red Planet because of the iron oxide (rust) on its surface, which gives it a reddish appearance.",
+      "category": "Science",
+      "difficulty": "Easy"
+    },
+    {
+      "id": 3,
+      "question": "Who painted the Mona Lisa?",
+      "options": {
+        "A": "Vincent van Gogh",
+        "B": "Pablo Picasso",
+        "C": "Leonardo da Vinci",
+        "D": "Michelangelo"
+      },
+      "correct_answer": "C",
+      "explanation": "Leonardo da Vinci painted the Mona Lisa between 1503-1519. It's one of the most famous paintings in the world and is displayed in the Louvre Museum in Paris.",
+      "category": "Art",
+      "difficulty": "Medium"
+    },
+    {
+      "id": 4,
+      "question": "What is the largest ocean on Earth?",
+      "options": {
+        "A": "Atlantic Ocean",
+        "B": "Indian Ocean",
+        "C": "Pacific Ocean",
+        "D": "Arctic Ocean"
+      },
+      "correct_answer": "C",
+      "explanation": "The Pacific Ocean is the largest ocean, covering more than 30% of Earth's surface and containing more than half of the planet's free water.",
+      "category": "Geography",
+      "difficulty": "Easy"
+    },
+    {
+      "id": 5,
+      "question": "Which programming language was created by Guido van Rossum?",
+      "options": {
+        "A": "Java",
+        "B": "Python",
+        "C": "C++",
+        "D": "JavaScript"
+      },
+      "correct_answer": "B",
+      "explanation": "Python was created by Guido van Rossum and first released in 1991. It's named after the British comedy group Monty Python.",
+      "category": "Technology",
+      "difficulty": "Medium"
+    },
+    {
+      "id": 6,
+      "question": "In which year did World War II end?",
+      "options": {
+        "A": "1944",
+        "B": "1945",
+        "C": "1946",
+        "D": "1947"
+      },
+      "correct_answer": "B",
+      "explanation": "World War II ended in 1945. The war in Europe ended on May 8, 1945 (V-E Day), and the war in the Pacific ended on September 2, 1945 (V-J Day).",
+      "category": "History",
+      "difficulty": "Medium"
+    },
+    {
+      "id": 7,
+      "question": "What is the chemical symbol for gold?",
+      "options": {
+        "A": "Go",
+        "B": "Gd",
+        "C": "Au",
+        "D": "Ag"
+      },
+      "correct_answer": "C",
+      "explanation": "The chemical symbol for gold is Au, derived from the Latin word 'aurum' meaning gold. Ag is the symbol for silver.",
+      "category": "Science",
+      "difficulty": "Medium"
+    },
+    {
+      "id": 8,
+      "question": "Which country hosted the 2020 Summer Olympics?",
+      "options": {
+        "A": "China",
+        "B": "Japan",
+        "C": "Brazil",
+        "D": "United Kingdom"
+      },
+      "correct_answer": "B",
+      "explanation": "Japan hosted the 2020 Summer Olympics in Tokyo, though they were held in 2021 due to the COVID-19 pandemic.",
+      "category": "Sports",
+      "difficulty": "Easy"
+    },
+    {
+      "id": 9,
+      "question": "Who wrote the novel '1984'?",
+      "options": {
+        "A": "George Orwell",
+        "B": "Aldous Huxley",
+        "C": "Ray Bradbury",
+        "D": "H.G. Wells"
+      },
+      "correct_answer": "A",
+      "explanation": "George Orwell wrote '1984' in 1949. It's a dystopian novel about totalitarian control and surveillance.",
+      "category": "Literature",
+      "difficulty": "Medium"
+    },
+    {
+      "id": 10,
+      "question": "What is the speed of light in vacuum?",
+      "options": {
+        "A": "299,792,458 m/s",
+        "B": "300,000,000 m/s",
+        "C": "299,792,458 km/s",
+        "D": "300,000,000 km/s"
+      },
+      "correct_answer": "A",
+      "explanation": "The speed of light in vacuum is exactly 299,792,458 meters per second. This is a fundamental constant in physics.",
+      "category": "Science",
+      "difficulty": "Hard"
+    }
+  ]
+}

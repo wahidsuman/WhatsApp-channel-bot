@@ -1,0 +1,102 @@
+name: WhatsApp MCQ Bot
+
+on:
+  schedule:
+    # Run at 9:00 AM UTC (adjust timezone as needed)
+    - cron: '0 9 * * *'
+    # Run at 12:00 PM UTC
+    - cron: '0 12 * * *'
+    # Run at 3:00 PM UTC
+    - cron: '0 15 * * *'
+    # Run at 6:00 PM UTC
+    - cron: '0 18 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  send-mcq:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: Start WAHA container
+      run: |
+        # Start WAHA container
+        docker run -d \
+          --name waha-mcq-bot \
+          -p 3000:3000 \
+          -e WAHA_WEBHOOK_URL="" \
+          -e WAHA_WEBHOOK_EVENTS="message,message.any" \
+          -e WAHA_REJECT_CALLS=true \
+          -e WAHA_MARK_ONLINE_ON_CONNECT=true \
+          devlikeapro/waha-plus:latest
+        
+        # Wait for WAHA to start
+        echo "Waiting for WAHA to start..."
+        sleep 30
+        
+        # Check if WAHA is running
+        curl -f http://localhost:3000/api/health || exit 1
+        echo "WAHA is running!"
+        
+    - name: Setup WhatsApp session
+      run: |
+        # Start WAHA session
+        curl -X POST http://localhost:3000/api/sessions/mcq_bot/start \
+          -H "Content-Type: application/json" \
+          -d '{
+            "name": "mcq_bot",
+            "config": {
+              "webhooks": [],
+              "webhookEvents": ["message", "message.any"],
+              "webhookUrl": "",
+              "events": ["message", "message.any"],
+              "rejectCalls": true,
+              "markOnlineOnConnect": true
+            }
+          }'
+        
+        # Get QR code (for initial setup)
+        echo "Getting QR code for WhatsApp connection..."
+        curl -X GET http://localhost:3000/api/sessions/mcq_bot/auth/qr
+        
+        # Wait for connection (this will timeout in CI, but that's expected)
+        echo "Waiting for WhatsApp connection..."
+        timeout 60 bash -c 'until curl -s http://localhost:3000/api/sessions/mcq_bot | grep -q "WORKING"; do sleep 5; done' || echo "Connection timeout (expected in CI)"
+        
+    - name: Run MCQ Bot
+      env:
+        QUESTIONS_CHANNEL_ID: ${{ secrets.QUESTIONS_CHANNEL_ID }}
+        ANSWERS_CHANNEL_ID: ${{ secrets.ANSWERS_CHANNEL_ID }}
+        WAHA_BASE_URL: http://localhost:3000
+        WAHA_SESSION_NAME: mcq_bot
+      run: |
+        # Run the bot
+        python bot.py
+        
+    - name: Cleanup
+      if: always()
+      run: |
+        # Stop and remove WAHA container
+        docker stop waha-mcq-bot || true
+        docker rm waha-mcq-bot || true
+        
+    - name: Upload logs
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: bot-logs-${{ github.run_number }}
+        path: |
+          sent_questions.json
+          *.log
