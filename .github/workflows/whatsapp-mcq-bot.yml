@@ -71,9 +71,15 @@ jobs:
         # Get QR code (for initial setup)
         echo "Getting QR code for WhatsApp connection..."
         echo "=========================================="
-        QR_RESPONSE=$(curl -X GET http://localhost:3000/api/sessions/default/auth/qr)
+        # Try different QR code endpoints
+        QR_RESPONSE=$(curl -X GET http://localhost:3000/api/sessions/default/auth/qr-code 2>/dev/null || curl -X GET http://localhost:3000/api/sessions/default/auth/qr 2>/dev/null || echo "QR code endpoint not found")
         echo "QR Code Response: $QR_RESPONSE"
         echo "=========================================="
+        
+        # Also try to get session status to see what's available
+        echo "Session Status:"
+        curl -X GET http://localhost:3000/api/sessions/default
+        echo ""
         
         # Wait for connection (this will timeout in CI, but that's expected)
         echo "Waiting for WhatsApp connection..."
