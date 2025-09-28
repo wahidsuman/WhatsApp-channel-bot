@@ -64,6 +64,21 @@ jobs:
           echo "https://www.qr-code-generator.com/"
           echo "Paste the URL above to generate QR code"
           echo "=========================================="
+          
+          # Create GitHub job summary with QR code
+          if [ -f "qr-data-url.txt" ]; then
+            echo "## WhatsApp QR Code" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Scan this QR code with WhatsApp:" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            DATA_URL=$(cat qr-data-url.txt)
+            echo "![QR Code]($DATA_URL)" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Alternative: Copy QR URL" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            cat qr-url.txt >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          fi
         fi
         
         # Wait for bot to complete

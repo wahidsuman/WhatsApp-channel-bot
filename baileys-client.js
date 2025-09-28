@@ -80,22 +80,14 @@ class BaileysClient {
                     });
                     
                     console.log('==========================================');
-                    console.log('🔴 IMPORTANT: Terminal QR codes may appear distorted!');
+                    console.log('📱 INSTRUCTIONS:');
                     console.log('==========================================');
-                    console.log('📱 FOR MOBILE USERS (GitHub Actions):');
-                    console.log('   1. Download artifacts after workflow completes');
-                    console.log('   2. Or copy the QR URL below');
-                    console.log('==========================================');
-                    console.log('💻 FOR DESKTOP USERS:');
-                    console.log('   1. Open whatsapp-qr.png image file');
-                    console.log('   2. Open qr-display.html in a web browser');
-                    console.log('   3. Use the QR code URL below directly');
-                    console.log('==========================================');
-                    console.log('📋 QR Code URL (copy this if QR appears broken):');
-                    console.log(qr);
+                    console.log('1. QR CODE IS SHOWN BELOW - SCAN IT!');
+                    console.log('2. If QR looks broken, use the URL at bottom');
+                    console.log('3. Check GitHub Summary for clear QR image');
                     console.log('==========================================');
                     
-                    // Save the raw QR URL
+                    // Save the raw QR URL first
                     fs.writeFileSync(path.join(__dirname, 'qr-url.txt'), qr);
                     
                     // Generate a data URL for the QR code
@@ -108,13 +100,18 @@ class BaileysClient {
                         }
                     });
                     
-                    // Only show terminal QR if specifically requested
-                    if (process.env.SHOW_TERMINAL_QR === 'true') {
-                        console.log('==========================================');
-                        console.log('Terminal QR Code (may be distorted):');
-                        qrcodeTerminal.generate(qr, { small: true });
-                        console.log('==========================================');
-                    }
+                    // Always show terminal QR code
+                    console.log('\n\n==========================================');
+                    console.log('📱📱📱 QR CODE TO SCAN WITH WHATSAPP 📱📱📱');
+                    console.log('==========================================\n');
+                    
+                    // Show QR code in terminal - try both methods
+                    qrcodeTerminal.generate(qr, { small: false });
+                    
+                    console.log('\n==========================================');
+                    console.log('📋 QR URL (if code above looks broken):');
+                    console.log(qr);
+                    console.log('==========================================\n');
                     
                     this.qrCodeGenerated = true;
                 }
