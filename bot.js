@@ -221,11 +221,17 @@ async function main() {
         
         // Connect to WhatsApp
         console.log('🔗 Connecting to WhatsApp...');
-        await bot.baileysClient.connect();
+        try {
+            await bot.baileysClient.connect();
+        } catch (error) {
+            console.log('⚠️ WhatsApp connection attempt completed');
+        }
         
         // Test connection
         if (!await bot.testConnection()) {
-            console.log('❌ WhatsApp connection failed. Please check your setup.');
+            console.log('❌ WhatsApp not connected yet.');
+            console.log('📱 Please scan the QR code above with your WhatsApp app');
+            console.log('🔄 Run the workflow again after scanning to send messages');
             return;
         }
         

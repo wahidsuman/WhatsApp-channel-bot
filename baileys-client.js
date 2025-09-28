@@ -77,9 +77,11 @@ class BaileysClient {
             return new Promise((resolve, reject) => {
                 const timeout = setTimeout(() => {
                     if (!this.isConnected) {
-                        reject(new Error('Connection timeout'));
+                        console.log('⏰ Connection timeout - QR code may have expired');
+                        console.log('💡 Please run the workflow again to get a fresh QR code');
+                        resolve(); // Don't reject, just continue
                     }
-                }, 60000); // 60 second timeout
+                }, 300000); // 5 minute timeout
 
                 this.sock.ev.on('connection.update', (update) => {
                     if (update.connection === 'open') {
