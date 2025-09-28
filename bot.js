@@ -233,19 +233,46 @@ async function main() {
             console.log('📱 Please scan the QR code with your WhatsApp app');
             console.log('==========================================');
             console.log('📱 FOR MOBILE USERS:');
-            console.log('1. Copy the QR URL from above');
-            console.log('2. Go to: https://www.qr-code-generator.com/');
-            console.log('3. Paste the URL to generate QR code');
-            console.log('4. Scan with WhatsApp');
+            console.log('1. Download artifacts NOW while bot is running');
+            console.log('2. Or copy the QR URL from above');
+            console.log('3. Go to: https://www.qr-code-generator.com/');
+            console.log('4. Paste the URL to generate QR code');
+            console.log('5. Scan with WhatsApp IMMEDIATELY');
             console.log('==========================================');
             console.log('💻 FOR DESKTOP USERS:');
             console.log('🖼️  QR Code image saved as: whatsapp-qr.png');
             console.log('🌐 Open qr-display.html in a browser');
             console.log('==========================================');
-            console.log('🔄 Run the workflow again after scanning to send messages');
             
-            // Exit gracefully
-            process.exit(0);
+            // Check if we should wait for connection
+            const waitForScan = process.env.WAIT_FOR_SCAN === 'true';
+            if (waitForScan) {
+                console.log('⏳ Waiting for QR code scan (2 minutes)...');
+                console.log('📱 SCAN THE QR CODE NOW!');
+                
+                // Wait for connection with periodic checks
+                let connected = false;
+                const maxWaitTime = 120000; // 2 minutes
+                const checkInterval = 5000; // Check every 5 seconds
+                const startTime = Date.now();
+                
+                while (!connected && (Date.now() - startTime) < maxWaitTime) {
+                    await new Promise(resolve => setTimeout(resolve, checkInterval));
+                    connected = await bot.testConnection();
+                    if (!connected) {
+                        const remainingTime = Math.round((maxWaitTime - (Date.now() - startTime)) / 1000);
+                        console.log(`⏱️  Still waiting... ${remainingTime} seconds remaining`);
+                    }
+                }
+                
+                if (!connected) {
+                    console.log('⏰ Timeout: QR code expired. Please run the workflow again.');
+                    process.exit(0);
+                }
+            } else {
+                console.log('🔄 Run the workflow again with WAIT_FOR_SCAN=true to keep waiting');
+                process.exit(0);
+            }
         }
         
         // Send daily questions

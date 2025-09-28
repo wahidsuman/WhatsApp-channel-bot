@@ -34,6 +34,7 @@ jobs:
       env:
         QUESTIONS_CHANNEL_ID: ${{ secrets.QUESTIONS_CHANNEL_ID }}
         ANSWERS_CHANNEL_ID: ${{ secrets.ANSWERS_CHANNEL_ID }}
+        WAIT_FOR_SCAN: true
       run: |
         # Run the Node.js bot with Baileys
         echo "Starting WhatsApp MCQ Bot with Baileys..."
@@ -54,22 +55,27 @@ jobs:
         # Display QR URL immediately for mobile users
         if [ -f "qr-url.txt" ]; then
           echo "=========================================="
-          echo "📱 SCAN THIS QR CODE NOW:"
+          echo "📱 SCAN THIS QR CODE NOW - BOT IS WAITING!"
           echo "=========================================="
-          echo "📋 Copy this URL and use a QR generator:"
+          echo "⏰ YOU HAVE 2 MINUTES TO SCAN BEFORE IT EXPIRES!"
+          echo "=========================================="
+          echo "📋 Option 1: Copy this URL and use a QR generator:"
           cat qr-url.txt
           echo ""
           echo "=========================================="
-          echo "🔗 Or use this online QR generator:"
-          echo "https://www.qr-code-generator.com/"
-          echo "Paste the URL above to generate QR code"
+          echo "🔗 Go to: https://www.qr-code-generator.com/"
+          echo "   1. Select 'Text' option"
+          echo "   2. Paste the URL above"
+          echo "   3. Generate and scan immediately"
+          echo "=========================================="
+          echo "📥 Option 2: Check artifacts (uploading now...)"
           echo "=========================================="
           
           # Create GitHub job summary with QR code
           if [ -f "qr-data-url.txt" ]; then
-            echo "## WhatsApp QR Code" >> $GITHUB_STEP_SUMMARY
+            echo "## ⚡ WhatsApp QR Code - SCAN NOW!" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "Scan this QR code with WhatsApp:" >> $GITHUB_STEP_SUMMARY
+            echo "**⏰ This QR code expires in 2 minutes!**" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             DATA_URL=$(cat qr-data-url.txt)
             echo "![QR Code]($DATA_URL)" >> $GITHUB_STEP_SUMMARY
@@ -78,13 +84,15 @@ jobs:
             echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
             cat qr-url.txt >> $GITHUB_STEP_SUMMARY
             echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**The bot is waiting for you to scan!**" >> $GITHUB_STEP_SUMMARY
           fi
         fi
         
         # Wait for bot to complete
         wait $BOT_PID
         
-    - name: Upload QR Code Artifacts
+    - name: Upload QR Code Artifacts (During Scan)
       if: always()
       uses: actions/upload-artifact@v4
       with:
