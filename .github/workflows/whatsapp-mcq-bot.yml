@@ -37,7 +37,37 @@ jobs:
       run: |
         # Run the Node.js bot with Baileys
         echo "Starting WhatsApp MCQ Bot with Baileys..."
-        npm start
+        # Run in background and capture output
+        npm start &
+        BOT_PID=$!
+        
+        # Wait for QR code to be generated
+        echo "Waiting for QR code generation..."
+        for i in {1..30}; do
+          if [ -f "qr-url.txt" ]; then
+            echo "✅ QR Code generated!"
+            break
+          fi
+          sleep 2
+        done
+        
+        # Display QR URL immediately for mobile users
+        if [ -f "qr-url.txt" ]; then
+          echo "=========================================="
+          echo "📱 SCAN THIS QR CODE NOW:"
+          echo "=========================================="
+          echo "📋 Copy this URL and use a QR generator:"
+          cat qr-url.txt
+          echo ""
+          echo "=========================================="
+          echo "🔗 Or use this online QR generator:"
+          echo "https://www.qr-code-generator.com/"
+          echo "Paste the URL above to generate QR code"
+          echo "=========================================="
+        fi
+        
+        # Wait for bot to complete
+        wait $BOT_PID
         
     - name: Upload QR Code Artifacts
       if: always()

@@ -19,6 +19,8 @@ class BaileysClient {
         this.sock = null;
         this.isConnected = false;
         this.qrCodeGenerated = false;
+        this.connectionAttempts = 0;
+        this.maxConnectionAttempts = 3;
     }
 
     async connect() {
@@ -121,12 +123,24 @@ class BaileysClient {
                     const shouldReconnect = (lastDisconnect?.error)?.output?.statusCode !== DisconnectReason.loggedOut;
                     console.log('Connection closed due to ', lastDisconnect?.error, ', reconnecting ', shouldReconnect);
                     
-                    if (shouldReconnect) {
-                        this.connect();
+                    // Check if it's a QR timeout (408 error)
+                    if (lastDisconnect?.error?.output?.statusCode === 408) {
+                        console.log('⏰ QR Code expired. Connection attempts:', this.connectionAttempts);
+                        if (this.connectionAttempts >= this.maxConnectionAttempts) {
+                            console.log('❌ Maximum connection attempts reached. Stopping.');
+                            return;
+                        }
+                    }
+                    
+                    if (shouldReconnect && this.connectionAttempts < this.maxConnectionAttempts) {
+                        this.connectionAttempts++;
+                        console.log(`🔄 Reconnection attempt ${this.connectionAttempts}/${this.maxConnectionAttempts}`);
+                        setTimeout(() => this.connect(), 5000); // Wait 5 seconds before reconnecting
                     }
                 } else if (connection === 'open') {
                     console.log('✅ WhatsApp connected successfully!');
                     this.isConnected = true;
+                    this.connectionAttempts = 0; // Reset on successful connection
                 }
             });
 
@@ -145,7 +159,7 @@ class BaileysClient {
                         console.log('💡 Please run the workflow again to get a fresh QR code');
                         resolve(); // Don't reject, just continue
                     }
-                }, 300000); // 5 minute timeout
+                }, 120000); // 2 minute timeout
 
                 this.sock.ev.on('connection.update', (update) => {
                     if (update.connection === 'open') {
