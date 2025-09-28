@@ -80,7 +80,11 @@ class BaileysClient {
                     console.log('==========================================');
                     console.log('🔴 IMPORTANT: Terminal QR codes may appear distorted!');
                     console.log('==========================================');
-                    console.log('📱 RECOMMENDED WAYS TO SCAN:');
+                    console.log('📱 FOR MOBILE USERS (GitHub Actions):');
+                    console.log('   1. Download artifacts after workflow completes');
+                    console.log('   2. Or copy the QR URL below');
+                    console.log('==========================================');
+                    console.log('💻 FOR DESKTOP USERS:');
                     console.log('   1. Open whatsapp-qr.png image file');
                     console.log('   2. Open qr-display.html in a web browser');
                     console.log('   3. Use the QR code URL below directly');

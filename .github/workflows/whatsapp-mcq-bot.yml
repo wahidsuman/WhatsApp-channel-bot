@@ -39,6 +39,38 @@ jobs:
         echo "Starting WhatsApp MCQ Bot with Baileys..."
         npm start
         
+    - name: Upload QR Code Artifacts
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: whatsapp-qr-codes
+        path: |
+          whatsapp-qr.png
+          whatsapp-qr.svg
+          qr-display.html
+          qr-mobile.html
+          qr-url.txt
+          qr-data-url.txt
+        retention-days: 1
+        
+    - name: Display QR Code URL
+      if: always()
+      run: |
+        echo "=========================================="
+        echo "📱 MOBILE USERS - QR CODE ACCESS:"
+        echo "=========================================="
+        if [ -f "qr-url.txt" ]; then
+          echo "📋 WhatsApp QR URL (copy and paste):"
+          cat qr-url.txt
+          echo ""
+          echo "=========================================="
+        fi
+        if [ -f "whatsapp-qr.png" ]; then
+          echo "✅ QR Code images have been uploaded as artifacts"
+          echo "📥 Download from: Actions → This workflow run → Artifacts → whatsapp-qr-codes"
+        fi
+        echo "=========================================="
+        
     - name: Cleanup
       if: always()
       run: |
