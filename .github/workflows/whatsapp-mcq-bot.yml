@@ -41,7 +41,7 @@ jobs:
         
     - name: Upload QR Code Artifacts
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: whatsapp-qr-codes
         path: |
