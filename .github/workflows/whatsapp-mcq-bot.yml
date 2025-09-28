@@ -30,73 +30,44 @@ jobs:
       run: |
         npm install
         
-    - name: Run MCQ Bot
+    - name: Generate QR Code
       env:
         QUESTIONS_CHANNEL_ID: ${{ secrets.QUESTIONS_CHANNEL_ID }}
         ANSWERS_CHANNEL_ID: ${{ secrets.ANSWERS_CHANNEL_ID }}
-        WAIT_FOR_SCAN: true
       run: |
-        # Run the Node.js bot with Baileys
-        echo "Starting WhatsApp MCQ Bot with Baileys..."
-        # Run in background and capture output
-        npm start &
+        # Start bot in background to generate QR
+        echo "Starting WhatsApp bot to generate QR code..."
+        timeout 60 npm start &
         BOT_PID=$!
         
-        # Wait for QR code to be generated
+        # Wait for QR code files to be generated
         echo "Waiting for QR code generation..."
         for i in {1..30}; do
-          if [ -f "qr-url.txt" ]; then
-            echo "✅ QR Code generated!"
+          if [ -f "whatsapp-qr.png" ] && [ -f "qr-url.txt" ]; then
+            echo "✅ QR Code generated successfully!"
+            # Kill the bot process since we only need the QR
+            kill $BOT_PID 2>/dev/null || true
             break
           fi
           sleep 2
         done
         
-        # Display QR URL immediately for mobile users
+        # Display QR info
         if [ -f "qr-url.txt" ]; then
           echo "=========================================="
-          echo "📱 SCAN THIS QR CODE NOW - BOT IS WAITING!"
+          echo "📱 QR CODE GENERATED - DOWNLOADING ARTIFACTS..."
           echo "=========================================="
-          echo "⏰ YOU HAVE 2 MINUTES TO SCAN BEFORE IT EXPIRES!"
-          echo "=========================================="
-          echo "📋 Option 1: Copy this URL and use a QR generator:"
+          echo "📋 QR URL for reference:"
           cat qr-url.txt
           echo ""
           echo "=========================================="
-          echo "🔗 Go to: https://www.qr-code-generator.com/"
-          echo "   1. Select 'Text' option"
-          echo "   2. Paste the URL above"
-          echo "   3. Generate and scan immediately"
-          echo "=========================================="
-          echo "📥 Option 2: Check artifacts (uploading now...)"
-          echo "=========================================="
-          
-          # Create GitHub job summary with QR code
-          if [ -f "qr-data-url.txt" ]; then
-            echo "## ⚡ WhatsApp QR Code - SCAN NOW!" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "**⏰ This QR code expires in 2 minutes!**" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            DATA_URL=$(cat qr-data-url.txt)
-            echo "![QR Code]($DATA_URL)" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "### Alternative: Copy QR URL" >> $GITHUB_STEP_SUMMARY
-            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-            cat qr-url.txt >> $GITHUB_STEP_SUMMARY
-            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "**The bot is waiting for you to scan!**" >> $GITHUB_STEP_SUMMARY
-          fi
         fi
         
-        # Wait for bot to complete
-        wait $BOT_PID
-        
-    - name: Upload QR Code Artifacts (During Scan)
+    - name: Upload QR Code NOW
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: whatsapp-qr-codes
+        name: whatsapp-qr-codes-live
         path: |
           whatsapp-qr.png
           whatsapp-qr.svg
@@ -106,25 +77,50 @@ jobs:
           qr-data-url.txt
         retention-days: 1
         
-    - name: Display QR Code URL
+    - name: Display Download Instructions
       if: always()
       run: |
         echo "=========================================="
-        echo "📱 MOBILE USERS - QR CODE ACCESS:"
+        echo "✅ QR CODE ARTIFACTS UPLOADED!"
         echo "=========================================="
-        if [ -f "qr-url.txt" ]; then
-          echo "📋 WhatsApp QR URL (copy and paste):"
-          cat qr-url.txt
-          echo ""
-          echo "=========================================="
-        fi
-        if [ -f "whatsapp-qr.png" ]; then
-          echo "✅ QR Code images have been uploaded as artifacts"
-          echo "📥 Download from: Actions → This workflow run → Artifacts → whatsapp-qr-codes"
-        fi
+        echo "📥 DOWNLOAD NOW:"
+        echo "   1. Click 'Summary' at the top of this page"
+        echo "   2. Or go to the workflow run page"
+        echo "   3. Download 'whatsapp-qr-codes-live' artifact"
+        echo "   4. Open whatsapp-qr.png and scan IMMEDIATELY"
         echo "=========================================="
+        echo "⏰ YOU HAVE ~90 SECONDS TO SCAN!"
+        echo "=========================================="
+        
+        # Create job summary
+        if [ -f "qr-data-url.txt" ]; then
+          echo "## ⚡ WhatsApp QR Code Ready!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📥 Download the artifact NOW and scan within 90 seconds!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          DATA_URL=$(cat qr-data-url.txt)
+          echo "![QR Code]($DATA_URL)" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+    - name: Run Bot with Connection Wait
+      env:
+        QUESTIONS_CHANNEL_ID: ${{ secrets.QUESTIONS_CHANNEL_ID }}
+        ANSWERS_CHANNEL_ID: ${{ secrets.ANSWERS_CHANNEL_ID }}
+        WAIT_FOR_SCAN: true
+      run: |
+        echo "=========================================="
+        echo "🤖 Starting bot - waiting for WhatsApp connection..."
+        echo "=========================================="
+        echo "📱 SCAN THE QR CODE FROM THE DOWNLOADED ARTIFACT!"
+        echo "=========================================="
+        
+        # Run the bot which will wait for connection
+        npm start
         
     - name: Cleanup
       if: always()
       run: |
         echo "Bot execution completed"
+        if [ -f "auth_info_baileys" ]; then
+          echo "✅ WhatsApp session saved for next run"
+        fi
