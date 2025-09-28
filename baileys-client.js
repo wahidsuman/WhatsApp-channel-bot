@@ -54,9 +54,14 @@ class BaileysClient {
                 logger: P({ level: 'silent' }),
                 printQRInTerminal: false,
                 auth: state,
-                browser: ['Chrome (Linux)', 'Chrome', '120.0.0.0'],
+                browser: ['Ubuntu', 'Chrome', '120.0.0.0'],
                 generateHighQualityLinkPreview: true,
-                syncFullHistory: false
+                syncFullHistory: false,
+                markOnlineOnConnect: false,
+                qrTimeout: 120000,
+                defaultQueryTimeoutMs: 60000,
+                keepAliveIntervalMs: 10000,
+                connectTimeoutMs: 60000
             });
 
             // Handle connection updates

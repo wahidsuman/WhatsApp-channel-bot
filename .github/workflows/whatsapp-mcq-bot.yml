@@ -74,8 +74,10 @@ jobs:
           whatsapp-qr.svg
           qr-display.html
           qr-mobile.html
+          manual-qr.html
           qr-url.txt
           qr-data-url.txt
+          test-qr.js
         retention-days: 1
         
     - name: Display Download Instructions

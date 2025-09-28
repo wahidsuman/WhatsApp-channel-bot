@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual WhatsApp QR Generator</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #25D366;
+            margin-bottom: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+        button {
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        button:hover {
+            background: #128C7E;
+        }
+        #qrcode {
+            margin: 20px auto;
+        }
+        .instructions {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        .instructions h3 {
+            margin-top: 0;
+            color: #1976d2;
+        }
+        .instructions ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .instructions li {
+            margin: 5px 0;
+        }
+        .error {
+            color: #d32f2f;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Manual WhatsApp QR Generator</h1>
+        
+        <p>Paste the QR URL from the GitHub Actions logs:</p>
+        
+        <textarea id="qrUrl" placeholder="Paste the QR URL here (starts with 2@...)"></textarea>
+        
+        <button onclick="generateQR()">Generate QR Code</button>
+        
+        <div id="qrcode"></div>
+        
+        <div id="error" class="error"></div>
+        
+        <div class="instructions">
+            <h3>How to use:</h3>
+            <ol>
+                <li>Run the GitHub Actions workflow</li>
+                <li>Look for "QR Code URL" in the logs</li>
+                <li>Copy the entire URL (starts with 2@...)</li>
+                <li>Paste it in the box above</li>
+                <li>Click "Generate QR Code"</li>
+                <li>Scan with WhatsApp → Settings → Linked Devices → Link a Device</li>
+            </ol>
+            
+            <h3>Troubleshooting:</h3>
+            <ul>
+                <li>Make sure you copy the ENTIRE URL</li>
+                <li>The URL should start with "2@"</li>
+                <li>Scan within 2 minutes of generation</li>
+                <li>If it fails, run the workflow again for a fresh QR</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        function generateQR() {
+            const url = document.getElementById('qrUrl').value.trim();
+            const qrcodeDiv = document.getElementById('qrcode');
+            const errorDiv = document.getElementById('error');
+            
+            // Clear previous
+            qrcodeDiv.innerHTML = '';
+            errorDiv.innerHTML = '';
+            
+            if (!url) {
+                errorDiv.innerHTML = 'Please paste the QR URL';
+                return;
+            }
+            
+            if (!url.startsWith('2@')) {
+                errorDiv.innerHTML = 'Invalid QR URL. It should start with "2@"';
+                return;
+            }
+            
+            try {
+                // Generate QR code
+                QRCode.toCanvas(url, {
+                    width: 300,
+                    margin: 2,
+                    color: {
+                        dark: '#000000',
+                        light: '#FFFFFF'
+                    }
+                }, function (error, canvas) {
+                    if (error) {
+                        errorDiv.innerHTML = 'Error generating QR code: ' + error;
+                        return;
+                    }
+                    qrcodeDiv.appendChild(canvas);
+                });
+            } catch (e) {
+                errorDiv.innerHTML = 'Error: ' + e.message;
+            }
+        }
+        
+        // Allow Enter key to generate
+        document.getElementById('qrUrl').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                generateQR();
+            }
+        });
+    </script>
+</body>
+</html>
