@@ -47,9 +47,20 @@ class BaileysClient {
                 if (qr) {
                     console.log('📱 QR Code generated!');
                     console.log('==========================================');
+                    console.log('QR Code URL:', qr);
+                    console.log('==========================================');
+                    
+                    // Try different QR code sizes
+                    console.log('QR Code (small):');
                     qrcode.generate(qr, { small: true });
                     console.log('==========================================');
+                    console.log('QR Code (large):');
+                    qrcode.generate(qr, { small: false });
+                    console.log('==========================================');
+                    
                     console.log('Scan the QR code above with your WhatsApp app');
+                    console.log('If the QR code looks incomplete, try the URL above');
+                    console.log('Alternative: Copy the URL and paste it in WhatsApp Web');
                     this.qrCodeGenerated = true;
                 }
                 
