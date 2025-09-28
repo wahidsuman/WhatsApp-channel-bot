@@ -8,9 +8,11 @@ const {
     useMultiFileAuthState,
     fetchLatestBaileysVersion 
 } = require('@whiskeysockets/baileys');
-const qrcode = require('qrcode-terminal');
+const qrcode = require('qrcode');
+const qrcodeTerminal = require('qrcode-terminal');
 const P = require('pino');
 const fs = require('fs');
+const path = require('path');
 
 class BaileysClient {
     constructor() {
@@ -47,20 +49,45 @@ class BaileysClient {
                 if (qr) {
                     console.log('📱 QR Code generated!');
                     console.log('==========================================');
+                    console.log('Scan the QR code below with your WhatsApp app');
+                    console.log('If the QR code looks incomplete, try the URL above');
+                    console.log('==========================================');
                     console.log('QR Code URL:', qr);
                     console.log('==========================================');
                     
-                    // Try different QR code sizes
-                    console.log('QR Code (small):');
-                    qrcode.generate(qr, { small: true });
-                    console.log('==========================================');
-                    console.log('QR Code (large):');
-                    qrcode.generate(qr, { small: false });
+                    // Generate QR code image file
+                    const qrPath = path.join(__dirname, 'whatsapp-qr.png');
+                    qrcode.toFile(qrPath, qr, {
+                        color: {
+                            dark: '#000000',
+                            light: '#FFFFFF'
+                        },
+                        width: 512,
+                        margin: 2
+                    }, (err) => {
+                        if (err) {
+                            console.error('Failed to generate QR code image:', err);
+                        } else {
+                            console.log(`✅ QR Code image saved to: ${qrPath}`);
+                            console.log('📱 Open the image file to scan it with WhatsApp');
+                        }
+                    });
+                    
+                    // Generate text version as base64 for easy copy-paste
+                    qrcode.toString(qr, { type: 'terminal', small: true }, (err, url) => {
+                        if (!err) {
+                            console.log('==========================================');
+                            console.log('QR Code (text):');
+                            console.log(url);
+                            console.log('==========================================');
+                        }
+                    });
+                    
+                    // Also use the original terminal library as backup
+                    console.log('QR Code (alternative display):');
+                    qrcodeTerminal.generate(qr, { small: true });
                     console.log('==========================================');
                     
-                    console.log('Scan the QR code above with your WhatsApp app');
-                    console.log('If the QR code looks incomplete, try the URL above');
-                    console.log('Alternative: Copy the URL and paste it in WhatsApp Web');
                     this.qrCodeGenerated = true;
                 }
                 

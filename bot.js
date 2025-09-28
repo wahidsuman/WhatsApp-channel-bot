@@ -231,6 +231,8 @@ async function main() {
         if (!await bot.testConnection()) {
             console.log('❌ WhatsApp not connected yet.');
             console.log('📱 Please scan the QR code above with your WhatsApp app');
+            console.log('🖼️  QR Code image saved as: whatsapp-qr.png');
+            console.log('🌐 You can also open qr-display.html in a browser for better QR display');
             console.log('🔄 Run the workflow again after scanning to send messages');
             return;
         }

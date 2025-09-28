@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Web QR Code</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            text-align: center;
+            max-width: 500px;
+        }
+        h1 {
+            color: #25d366;
+            margin-bottom: 20px;
+        }
+        .qr-container {
+            margin: 30px 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+        }
+        #qrcode {
+            margin: 0 auto;
+            display: inline-block;
+        }
+        .instructions {
+            color: #666;
+            line-height: 1.6;
+            margin-top: 20px;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .status.waiting {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .status.connected {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .refresh-btn {
+            background-color: #25d366;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+        .refresh-btn:hover {
+            background-color: #128c7e;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>WhatsApp Web QR Code</h1>
+        
+        <div class="qr-container">
+            <div id="qrcode">
+                <img src="whatsapp-qr.png" alt="WhatsApp QR Code" style="max-width: 100%; height: auto;">
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>How to connect:</h3>
+            <ol style="text-align: left;">
+                <li>Open WhatsApp on your phone</li>
+                <li>Go to Settings → Linked Devices</li>
+                <li>Tap on "Link a Device"</li>
+                <li>Scan this QR code</li>
+            </ol>
+        </div>
+        
+        <div class="status waiting" id="status">
+            Waiting for connection...
+        </div>
+        
+        <button class="refresh-btn" onclick="location.reload()">
+            Refresh QR Code
+        </button>
+    </div>
+    
+    <script>
+        // Auto-refresh the page every 30 seconds to get a fresh QR code if needed
+        setTimeout(() => {
+            location.reload();
+        }, 30000);
+        
+        // Check if the QR image exists
+        const img = document.querySelector('#qrcode img');
+        img.onerror = function() {
+            document.getElementById('qrcode').innerHTML = '<p style="color: #721c24;">QR Code not generated yet. Please run the bot first.</p>';
+            document.getElementById('status').className = 'status error';
+            document.getElementById('status').textContent = 'QR Code not available';
+        };
+    </script>
+</body>
+</html>
