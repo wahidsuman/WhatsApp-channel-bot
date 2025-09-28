@@ -35,7 +35,8 @@ jobs:
         QUESTIONS_CHANNEL_ID: ${{ secrets.QUESTIONS_CHANNEL_ID }}
         ANSWERS_CHANNEL_ID: ${{ secrets.ANSWERS_CHANNEL_ID }}
       run: |
-        # Run the bot
+        # Run the Node.js bot with Baileys
+        echo "Starting WhatsApp MCQ Bot with Baileys..."
         npm start
         
     - name: Cleanup
