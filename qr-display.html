@@ -83,7 +83,13 @@
         
         <div class="qr-container">
             <div id="qrcode">
-                <img src="whatsapp-qr.png" alt="WhatsApp QR Code" style="max-width: 100%; height: auto;">
+                <img id="qr-png" src="whatsapp-qr.png" alt="WhatsApp QR Code" style="max-width: 100%; height: auto; display: none;">
+                <img id="qr-svg" src="whatsapp-qr.svg" alt="WhatsApp QR Code" style="max-width: 100%; height: auto;">
+            </div>
+            <div id="qr-url" style="margin-top: 20px; display: none;">
+                <p style="color: #666; font-size: 14px;">If QR code doesn't display, copy this URL:</p>
+                <textarea id="qr-url-text" style="width: 100%; height: 60px; font-size: 12px; padding: 10px; border: 1px solid #ddd; border-radius: 5px;" readonly></textarea>
+                <button onclick="copyQRUrl()" style="margin-top: 10px; padding: 8px 20px; background-color: #128c7e; color: white; border: none; border-radius: 5px; cursor: pointer;">Copy URL</button>
             </div>
         </div>
         
@@ -112,13 +118,56 @@
             location.reload();
         }, 30000);
         
-        // Check if the QR image exists
-        const img = document.querySelector('#qrcode img');
-        img.onerror = function() {
-            document.getElementById('qrcode').innerHTML = '<p style="color: #721c24;">QR Code not generated yet. Please run the bot first.</p>';
+        // Check QR images and fallback
+        const svgImg = document.getElementById('qr-svg');
+        const pngImg = document.getElementById('qr-png');
+        const qrUrlDiv = document.getElementById('qr-url');
+        
+        svgImg.onerror = function() {
+            // Try PNG if SVG fails
+            svgImg.style.display = 'none';
+            pngImg.style.display = 'block';
+        };
+        
+        pngImg.onerror = function() {
+            // Show error and URL input if both fail
+            document.getElementById('qrcode').innerHTML = '<p style="color: #721c24;">QR Code images not available.</p>';
             document.getElementById('status').className = 'status error';
             document.getElementById('status').textContent = 'QR Code not available';
+            
+            // Try to load QR URL from file
+            fetch('qr-data-url.txt')
+                .then(response => response.text())
+                .then(dataUrl => {
+                    if (dataUrl.startsWith('data:image')) {
+                        const img = document.createElement('img');
+                        img.src = dataUrl;
+                        img.style.maxWidth = '100%';
+                        document.getElementById('qrcode').innerHTML = '';
+                        document.getElementById('qrcode').appendChild(img);
+                        document.getElementById('status').className = 'status waiting';
+                        document.getElementById('status').textContent = 'Waiting for connection...';
+                    }
+                })
+                .catch(err => {
+                    qrUrlDiv.style.display = 'block';
+                });
         };
+        
+        function copyQRUrl() {
+            const textArea = document.getElementById('qr-url-text');
+            textArea.select();
+            document.execCommand('copy');
+            alert('QR URL copied to clipboard!');
+        }
+        
+        // Load QR URL if available
+        fetch('qr-url.txt')
+            .then(response => response.text())
+            .then(url => {
+                document.getElementById('qr-url-text').value = url;
+            })
+            .catch(err => {});
     </script>
 </body>
 </html>

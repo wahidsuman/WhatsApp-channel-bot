@@ -49,13 +49,8 @@ class BaileysClient {
                 if (qr) {
                     console.log('📱 QR Code generated!');
                     console.log('==========================================');
-                    console.log('Scan the QR code below with your WhatsApp app');
-                    console.log('If the QR code looks incomplete, try the URL above');
-                    console.log('==========================================');
-                    console.log('QR Code URL:', qr);
-                    console.log('==========================================');
                     
-                    // Generate QR code image file
+                    // Generate QR code image file FIRST
                     const qrPath = path.join(__dirname, 'whatsapp-qr.png');
                     qrcode.toFile(qrPath, qr, {
                         color: {
@@ -63,30 +58,57 @@ class BaileysClient {
                             light: '#FFFFFF'
                         },
                         width: 512,
-                        margin: 2
+                        margin: 4,
+                        errorCorrectionLevel: 'M'
                     }, (err) => {
                         if (err) {
                             console.error('Failed to generate QR code image:', err);
                         } else {
                             console.log(`✅ QR Code image saved to: ${qrPath}`);
-                            console.log('📱 Open the image file to scan it with WhatsApp');
                         }
                     });
                     
-                    // Generate text version as base64 for easy copy-paste
-                    qrcode.toString(qr, { type: 'terminal', small: true }, (err, url) => {
+                    // Also save as SVG for better quality
+                    const svgPath = path.join(__dirname, 'whatsapp-qr.svg');
+                    qrcode.toString(qr, { type: 'svg', width: 400 }, (err, svg) => {
                         if (!err) {
-                            console.log('==========================================');
-                            console.log('QR Code (text):');
-                            console.log(url);
-                            console.log('==========================================');
+                            fs.writeFileSync(svgPath, svg);
+                            console.log(`✅ QR Code SVG saved to: ${svgPath}`);
                         }
                     });
                     
-                    // Also use the original terminal library as backup
-                    console.log('QR Code (alternative display):');
-                    qrcodeTerminal.generate(qr, { small: true });
                     console.log('==========================================');
+                    console.log('🔴 IMPORTANT: Terminal QR codes may appear distorted!');
+                    console.log('==========================================');
+                    console.log('📱 RECOMMENDED WAYS TO SCAN:');
+                    console.log('   1. Open whatsapp-qr.png image file');
+                    console.log('   2. Open qr-display.html in a web browser');
+                    console.log('   3. Use the QR code URL below directly');
+                    console.log('==========================================');
+                    console.log('📋 QR Code URL (copy this if QR appears broken):');
+                    console.log(qr);
+                    console.log('==========================================');
+                    
+                    // Save the raw QR URL
+                    fs.writeFileSync(path.join(__dirname, 'qr-url.txt'), qr);
+                    
+                    // Generate a data URL for the QR code
+                    qrcode.toDataURL(qr, { width: 400, margin: 4 }, (err, dataUrl) => {
+                        if (!err) {
+                            console.log('🌐 QR Code Data URL (paste in browser):');
+                            console.log(dataUrl.substring(0, 100) + '...');
+                            console.log('(Full URL saved to qr-data-url.txt)');
+                            fs.writeFileSync(path.join(__dirname, 'qr-data-url.txt'), dataUrl);
+                        }
+                    });
+                    
+                    // Only show terminal QR if specifically requested
+                    if (process.env.SHOW_TERMINAL_QR === 'true') {
+                        console.log('==========================================');
+                        console.log('Terminal QR Code (may be distorted):');
+                        qrcodeTerminal.generate(qr, { small: true });
+                        console.log('==========================================');
+                    }
                     
                     this.qrCodeGenerated = true;
                 }
