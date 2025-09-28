@@ -27,6 +27,20 @@ class BaileysClient {
         try {
             console.log('🚀 Starting WhatsApp connection...');
             
+            // Clear old auth if requested
+            if (process.env.CLEAR_AUTH === 'true') {
+                console.log('🧹 Clearing old authentication...');
+                try {
+                    const authPath = './auth_info_baileys';
+                    if (fs.existsSync(authPath)) {
+                        fs.rmSync(authPath, { recursive: true, force: true });
+                        console.log('✅ Old auth cleared');
+                    }
+                } catch (err) {
+                    console.log('⚠️ Could not clear old auth:', err.message);
+                }
+            }
+            
             // Load auth state
             const { state, saveCreds } = await useMultiFileAuthState('./auth_info_baileys');
             
@@ -40,16 +54,26 @@ class BaileysClient {
                 logger: P({ level: 'silent' }),
                 printQRInTerminal: false,
                 auth: state,
-                browser: ['MCQ Bot', 'Chrome', '1.0.0'],
-                generateHighQualityLinkPreview: true
+                browser: ['Chrome (Linux)', 'Chrome', '120.0.0.0'],
+                generateHighQualityLinkPreview: true,
+                syncFullHistory: false
             });
 
             // Handle connection updates
             this.sock.ev.on('connection.update', (update) => {
-                const { connection, lastDisconnect, qr } = update;
+                const { connection, lastDisconnect, qr, isNewLogin } = update;
+                
+                // Log all connection updates for debugging
+                console.log('🔍 Connection update:', { 
+                    connection, 
+                    isNewLogin,
+                    lastError: lastDisconnect?.error?.message 
+                });
                 
                 if (qr) {
                     console.log('📱 QR Code generated!');
+                    console.log('QR Length:', qr.length);
+                    console.log('QR Sample:', qr.substring(0, 50) + '...');
                     console.log('==========================================');
                     
                     // Generate QR code image file FIRST
