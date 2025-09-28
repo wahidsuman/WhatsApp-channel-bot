@@ -1,6 +1,6 @@
 # WhatsApp MCQ Bot
 
-A hands-free WhatsApp bot that sends multiple choice questions to WhatsApp channels at scheduled intervals.
+A hands-free WhatsApp bot that sends multiple choice questions to WhatsApp channels at scheduled intervals using Baileys.
 
 ## Features
 
@@ -9,7 +9,8 @@ A hands-free WhatsApp bot that sends multiple choice questions to WhatsApp chann
 - ✅ Answers sent to Answers Channel simultaneously
 - 📊 Tracks emoji reactions and shows statistics
 - 🤖 Completely automated using GitHub Actions
-- 💰 100% Free to run
+- 💰 100% Free to run (using Baileys)
+- 🔒 Secure WhatsApp Web connection
 
 ## How It Works
 
@@ -22,10 +23,10 @@ A hands-free WhatsApp bot that sends multiple choice questions to WhatsApp chann
 ## Setup
 
 1. Create two WhatsApp channels (Questions & Answers)
-2. Configure channel IDs in `config.py`
+2. Configure channel IDs in GitHub Secrets
 3. Add your questions to `questions.json`
 4. Deploy to GitHub Actions
-5. Connect your WhatsApp account
+5. Scan QR code to connect WhatsApp
 
 ## Schedule
 
@@ -36,9 +37,9 @@ A hands-free WhatsApp bot that sends multiple choice questions to WhatsApp chann
 
 ## Files
 
-- `bot.py` - Main bot logic
-- `waha.py` - WAHA integration
+- `bot.js` - Main bot logic (Node.js)
+- `baileys-client.js` - Baileys WhatsApp client
 - `questions.json` - Question database
-- `config.py` - Configuration settings
+- `package.json` - Node.js dependencies
 - `.github/workflows/mcq-bot.yml` - GitHub Actions workflow
-- `requirements.txt` - Python dependencies
+- `test.js` - Test script
