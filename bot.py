@@ -5,9 +5,10 @@ WhatsApp MCQ Bot - Main bot logic
 import json
 import time
 import random
+import os
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
-from waha import WAHAClient
+from whapi_client import WhapiClient
 from config import (
     QUESTIONS_CHANNEL_ID, 
     ANSWERS_CHANNEL_ID, 
@@ -20,7 +21,14 @@ class MCQBot:
     """Main bot class for handling MCQ questions and answers"""
     
     def __init__(self):
-        self.waha_client = WAHAClient()
+        # Get Whapi.cloud credentials from environment variables
+        api_token = os.getenv("WHAPI_API_TOKEN")
+        instance_id = os.getenv("WHAPI_INSTANCE_ID")
+        
+        if not api_token or not instance_id:
+            raise ValueError("WHAPI_API_TOKEN and WHAPI_INSTANCE_ID environment variables are required")
+        
+        self.whapi_client = WhapiClient(api_token, instance_id)
         self.questions = self.load_questions()
         self.sent_questions = self.load_sent_questions()
         
@@ -134,7 +142,7 @@ class MCQBot:
         message = self.format_question_message(question, question_num)
         
         print(f"📤 Sending question {question_num} to Questions Channel...")
-        result = self.waha_client.send_message(QUESTIONS_CHANNEL_ID, message)
+        result = self.whapi_client.send_message_to_channel(QUESTIONS_CHANNEL_ID, message)
         
         if "error" in result:
             print(f"❌ Failed to send question: {result['error']}")
@@ -163,7 +171,7 @@ class MCQBot:
         message = self.format_answer_message(question, question_num)
         
         print(f"📤 Sending answer {question_num} to Answers Channel...")
-        result = self.waha_client.send_message(ANSWERS_CHANNEL_ID, message)
+        result = self.whapi_client.send_message_to_channel(ANSWERS_CHANNEL_ID, message)
         
         if "error" in result:
             print(f"❌ Failed to send answer: {result['error']}")
@@ -224,13 +232,7 @@ class MCQBot:
         """Test WhatsApp connection"""
         print("🔧 Testing WhatsApp connection...")
         
-        status = self.waha_client.get_session_status()
-        if status.get("status") == "WORKING":
-            print("✅ WhatsApp connection is working")
-            return True
-        else:
-            print(f"❌ WhatsApp connection status: {status.get('status', 'Unknown')}")
-            return False
+        return self.whapi_client.test_connection()
 
 def main():
     """Main function"""

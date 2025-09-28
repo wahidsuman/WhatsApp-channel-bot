@@ -30,82 +30,17 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         
-    - name: Start WAHA container
+    - name: Setup Whapi.cloud connection
       run: |
-        # Start WAHA container with proper configuration
-        docker run -d \
-          --name waha-mcq-bot \
-          -p 3000:3000 \
-          -e WAHA_WEBHOOK_URL="" \
-          -e WAHA_WEBHOOK_EVENTS="message,message.any" \
-          -e WAHA_REJECT_CALLS=true \
-          -e WAHA_MARK_ONLINE_ON_CONNECT=true \
-          -e WAHA_SESSION_NAME="default" \
-          devlikeapro/waha:latest
-        
-        # Wait for WAHA to start
-        echo "Waiting for WAHA to start..."
-        sleep 30
-        
-        # Check if WAHA is running (try different endpoints)
-        echo "Checking WAHA status..."
-        curl -f http://localhost:3000/api/sessions || curl -f http://localhost:3000/ || echo "WAHA is running (health check passed)"
-        echo "WAHA is ready!"
-        
-    - name: Setup WhatsApp session
-      run: |
-        # Start WAHA session (use 'default' session for free version)
-        curl -X POST http://localhost:3000/api/sessions/default/start \
-          -H "Content-Type: application/json" \
-          -d '{
-            "name": "default",
-            "config": {
-              "webhooks": [],
-              "webhookEvents": ["message", "message.any"],
-              "webhookUrl": "",
-              "events": ["message", "message.any"],
-              "rejectCalls": true,
-              "markOnlineOnConnect": true
-            }
-          }'
-        
-        # Wait for session to be ready
-        echo "Waiting for session to be ready..."
-        sleep 15
-        
-        # Check session status
-        echo "Session Status:"
-        curl -X GET http://localhost:3000/api/sessions/default
-        echo ""
-        
-        # Get QR code (for initial setup)
-        echo "Getting QR code for WhatsApp connection..."
-        echo "=========================================="
-        # Try different QR code endpoints for free WAHA
-        echo "Trying /api/sessions/default/auth/qr..."
-        curl -X GET http://localhost:3000/api/sessions/default/auth/qr
-        echo ""
-        echo "Trying /api/sessions/default/auth/qr-code..."
-        curl -X GET http://localhost:3000/api/sessions/default/auth/qr-code
-        echo ""
-        echo "Trying /api/sessions/default/qr..."
-        curl -X GET http://localhost:3000/api/sessions/default/qr
-        echo ""
-        echo "Trying to access WAHA web interface..."
-        curl -X GET http://localhost:3000/
-        echo ""
-        echo "=========================================="
-        
-        # Wait for connection (this will timeout in CI, but that's expected)
-        echo "Waiting for WhatsApp connection..."
-        timeout 60 bash -c 'until curl -s http://localhost:3000/api/sessions/default | grep -q "WORKING"; do sleep 5; done' || echo "Connection timeout (expected in CI)"
+        echo "Setting up Whapi.cloud connection..."
+        echo "Whapi.cloud is ready to use!"
         
     - name: Run MCQ Bot
       env:
         QUESTIONS_CHANNEL_ID: ${{ secrets.QUESTIONS_CHANNEL_ID }}
         ANSWERS_CHANNEL_ID: ${{ secrets.ANSWERS_CHANNEL_ID }}
-        WAHA_BASE_URL: http://localhost:3000
-        WAHA_SESSION_NAME: default
+        WHAPI_API_TOKEN: ${{ secrets.WHAPI_API_TOKEN }}
+        WHAPI_INSTANCE_ID: ${{ secrets.WHAPI_INSTANCE_ID }}
       run: |
         # Run the bot
         python bot.py
@@ -113,6 +48,4 @@ jobs:
     - name: Cleanup
       if: always()
       run: |
-        # Stop and remove WAHA container
-        docker stop waha-mcq-bot || true
-        docker rm waha-mcq-bot || true
+        echo "Bot execution completed"
